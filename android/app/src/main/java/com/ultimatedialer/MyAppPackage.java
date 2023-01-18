@@ -21,7 +21,7 @@ public class MyAppPackage implements ReactPackage {
             ReactApplicationContext reactContext) {
                 List<NativeModule> modules = new ArrayList<>();
 
-                modules.add(new CalendarModule(reactContext));
+                modules.add(new DialerModule(reactContext));
 
                 return modules;
     }
