@@ -1,10 +1,6 @@
 // React Import
 import React, { useState, useEffect } from "react";
 import {
-  NativeModules,
-  Button,
-  Text,
-  PermissionsAndroid,
   View,
   StyleSheet,
 } from "react-native";
@@ -20,7 +16,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import LogInScreen from "./src/components/LogInScreen";
 import Dashboard from "./src/components/Dashboard";
 import Settings from "./src/components/Settings";
-import DialerComponent from "./src/components/DialerComponent";
 
 //Context Import
 import { CurrentListContextProvider } from "./src/utility/Contexts/CurrentListContext";
@@ -93,7 +88,6 @@ function App() {
             </Tab.Navigator>
           </NavigationContainer>
         </CurrentListContextProvider>
-        {/* <DialerComponent />; */}
       </View>
     );
   }
