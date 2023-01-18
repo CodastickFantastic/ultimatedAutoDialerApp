@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "643640911504",
+    "project_id": "ultimatedialerapp",
+    "storage_bucket": "ultimatedialerapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643640911504:android:8c451e1b2d48f8def79a15",
+        "android_client_info": {
+          "package_name": "com.ultimatedialer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "643640911504-i5i1mgfhbg66tmga3nlvdqsop2m57681.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ultimatedialer",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "643640911504-shh028kbpgkinmirk8tdkr49badf1n8s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzPBQQUq-9rojctSFhdCF59zZjJJ7DUXE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "643640911504-shh028kbpgkinmirk8tdkr49badf1n8s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
