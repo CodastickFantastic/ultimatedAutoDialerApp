@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#d9d9d9",
   },
   loginTitle: {
     fontSize: 28,

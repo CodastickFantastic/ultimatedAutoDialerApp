@@ -64,7 +64,7 @@ function App() {
                   <Dashboard
                     {...props}
                     userName={user.displayName.split(" ")[0]}
-                    avatar={user.photoURL}
+                    
                   />
                 )}
               </Tab.Screen>
@@ -80,9 +80,16 @@ function App() {
               />
               <Tab.Screen
                 name="Settings"
-                component={Settings}
                 options={{ headerShown: false }}
-              />
+              >
+                {(props) => (
+                  <Settings
+                    {...props}
+                    userName={user.displayName}
+                    avatar={user.photoURL}
+                  />
+                )}
+              </Tab.Screen>
             </Tab.Navigator>
           </NavigationContainer>
         </CurrentListContextProvider>

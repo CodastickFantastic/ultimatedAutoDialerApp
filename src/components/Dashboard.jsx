@@ -1,99 +1,220 @@
 // Import React
 import React, { useEffect, useState, useContext } from "react";
-import { Text, View, StyleSheet, Image, Button } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  NativeModules,
+  PermissionsAndroid,
+} from "react-native";
 
 // Dropdown Selector
 import SelectDropdown from "react-native-select-dropdown";
-
-// Firebase Database Import
-import database, { firebase } from "@react-native-firebase/database";
 
 // Import Context
 import CurrentListContext from "../utility/Contexts/CurrentListContext";
 
 function Dashboard(props) {
+  // Feedback List
   const feedbackOptions = ["Called", "Not answer", "Lead", "Calendar"];
- 
+
+  // Context Variables
   const { currentList, dataBaseObj } = useContext(CurrentListContext);
 
-  
+  // Native Module Initializer - Dialer
+  const { DialerModule } = NativeModules;
 
-  // function getContacts() {
-  //   firebase
-  //     .app()
-  //     .database(
-  //       "https://ultimatedialerapp-default-rtdb.europe-west1.firebasedatabase.app/"
-  //     )
-  //     .ref(`/users/${props.userID}/contactLists/${callingList}`)
-  //     .once("value")
-  //     .then(response => response.toJSON())
-  //     .then(data => console.log(data))
-  // }
-  // console.log(dataBaseObj.contactLists.Facebook);
-  if (dataBaseObj) {
-    for (contact in dataBaseObj.contactLists.Facebook) {
-      console.log(contact, dataBaseObj.contactLists.Facebook[contact].number);
+  function makeCall(number = "") {
+    // Andoid require permision to make calls, here we ask user for that permission if it is not granted.
+    async function requestCallPhonePrrmission() {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+          {
+            title: "Ultimate Dialer App Permission",
+            message: "Ultimate Dialer need acces to your phone call",
+            buttonNeutral: "Ask me later",
+            buttonNegative: "Denied",
+            buttonPositive: "Grant",
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          await DialerModule.makeCall(number);
+        } else {
+          console.log("Permission denied");
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
+    requestCallPhonePrrmission();
   }
+
+  // if (dataBaseObj) {
+  //   for (contact in dataBaseObj.contactLists.Facebook) {
+  //     console.log(contact, dataBaseObj.contactLists.Facebook[contact].number);
+  //   }
+  // }
 
   return (
     <View style={styles.componentContainer}>
-      <View style={styles.userGreeting}>
-        <Image style={styles.userAvatar} source={{ uri: props.avatar }} />
-        <View>
-          <Text style={styles.userName}>Hi {props.userName}, </Text>
-
-          {currentList == "" ? (
-            <Text>Go to settings and pick a list to start calling</Text>
-          ) : (
-            <Text>
-              you have <Text tyle={{ color: "#24A0ED" }}>128</Text> contact to
-              call in list{" "}
-              <Text style={{ color: "#24A0ED" }}>{currentList}</Text>
-            </Text>
-          )}
+      {currentList == "" ? (
+        <View style={styles.userGreeting}>
+          <Text style={{ color: "#24A0ED", fontSize: 24, textAlign: "center" }}>
+            Hi {props.userName}
+          </Text>
+          <Text style={{ marginBottom: 10, textAlign: "center" }}>
+            Go to settings, pick "list to call" and come here back.
+          </Text>
+          <Text style={{ textAlign: "center" }}>
+            If you dont have any lists you have to add it via Web Browser under
+            https://www.ultiamteautodialer.com/
+          </Text>
         </View>
-      </View>
-      <View style={styles.mainContent}>
-        <Text>Adam Kowalski</Text>
-        <Text>501 721 417</Text>
-        <Button title="Make a call" />
-        <SelectDropdown
-          data={feedbackOptions}
-          buttonStyle={{ width: "auto" }}
-          buttonTextStyle={{ fontSize: 14 }}
-          defaultButtonText="Select feedback..."
-        />
-        <Button title="Next Number" />
-      </View>
+      ) : (
+        <>
+          <View style={styles.statsContainer}>
+            <Text style={styles.basicFont}>Currently calling list</Text>
+            <Text style={{ color: "#24A0ED", fontSize: 26 }}>
+              {currentList}
+            </Text>
+            <View style={styles.callsInfo}>
+              <View style={styles.callsInfoLeft}>
+                <Text style={{ color: "#24A0ED", fontSize: 34 }}>127</Text>
+                <Text style={styles.basicFont}>Done</Text>
+              </View>
+              <View style={styles.callsInfoRight}>
+                <Text style={{ color: "#24A0ED", fontSize: 34 }}>231</Text>
+                <Text style={styles.basicFont}>To Call</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.mainContentConatiner}>
+            <Text
+              style={{ color: "#24A0ED", fontSize: 24, textAlign: "center" }}
+            >
+              Current Contact
+            </Text>
+            <Text
+              style={{
+                color: "black",
+                fontSize: 28,
+                marginBottom: 10,
+                fontWeight: "700",
+                textAlign: "center",
+              }}
+            >
+              Adam Kowalski
+            </Text>
+
+            <Text style={styles.basicFont}>
+              <Image
+                source={require("../images/icons/phone.png")}
+                style={{ width: 20, height: 20 }}
+              />{" "}
+              501 721 417
+            </Text>
+            <Text style={styles.basicFont}>
+              <Image
+                source={require("../images/icons/mail.png")}
+                style={{ width: 20, height: 20 }}
+              />{" "}
+              adam.kowalskii@gmail.com
+            </Text>
+            <SelectDropdown
+              data={feedbackOptions}
+              buttonStyle={styles.selectDropdown}
+              buttonTextStyle={{ fontSize: 26 }}
+              defaultButtonText="Select feedback..."
+            />
+            <Text style={styles.basicFont}>Add note</Text>
+            <TextInput style={styles.note} multiline={true} />
+            <View style={styles.buttonSection}>
+              <TouchableOpacity
+                style={styles.callBtn}
+                onPress={() => makeCall("+48 501 721 417")}
+              >
+                <Text style={styles.basicFont}>Call</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.nextBtn}>
+                <Text style={styles.basicFont}>Next</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  basicFont: {
+    color: "black",
+    fontSize: 22,
+    textAlign: "center",
+  },
   componentContainer: {
     height: "100%",
+    padding: 20,
     alignItems: "center",
+    justifyContent: "center",
     flex: 1,
+    backgroundColor: "#d9d9d9",
   },
-  userGreeting: {
+  statsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  callsInfo: {
+    marginTop: 20,
+    width: 300,
+    flexDirection: "row",
+    borderWidth: 1,
+    borderRadius: 20,
+  },
+  callsInfoLeft: {
+    flex: 1,
+    borderRightWidth: 1,
+    alignItems: "center",
+  },
+  callsInfoRight: {
     flex: 1,
     alignItems: "center",
   },
-  userAvatar: {
-    marginTop: 30,
-    width: 90,
-    height: 90,
-    borderRadius: 50,
-  },
-  userName: {
-    fontSize: 20,
-    color: "#24A0ED",
-  },
-  mainContent: {
-    backgroundColor: "pink",
+  mainContentConatiner: {
     flex: 2,
-    width: 200,
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  selectDropdown: {
+    marginTop: 20,
+    marginBottom: 20,
+    width: "100%",
+  },
+  note: {
+    backgroundColor: "white",
+    marginBottom: 20,
+    height: 100,
+  },
+  buttonSection: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+  callBtn: {
+    backgroundColor: "#32DE84",
+    flex: 2,
+    marginRight: 10,
+    height: 35,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nextBtn: {
+    backgroundColor: "#24A0ED",
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
