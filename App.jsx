@@ -1,9 +1,6 @@
 // React Import
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-} from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 
 // Google FireBase Import
 import auth from "@react-native-firebase/auth";
@@ -55,35 +52,92 @@ function App() {
         <CurrentListContextProvider userID={user.uid}>
           <NavigationContainer>
             <Tab.Navigator>
-              <Tab.Screen name="Dashboard" options={{ headerShown: false }}>
+              <Tab.Screen
+                name="Dashboard"
+                options={{
+                  headerShown: false,
+                  tabBarIcon: ({ focused, size }) => {
+                    return focused ? (
+                      <Image
+                        source={require("./src/images/icons/home-blue.png")}
+                        style={{ width: size, height: size }}
+                      />
+                    ) : (
+                      <Image
+                        source={require("./src/images/icons/home.png")}
+                        style={{ width: size, height: size }}
+                      />
+                    );
+                  },
+                }}
+              >
                 {(props) => (
                   <Dashboard
                     {...props}
                     userName={user.displayName.split(" ")[0]}
                     userID={user.uid}
-                    
                   />
                 )}
               </Tab.Screen>
               <Tab.Screen
                 name="Call List"
-                options={{ headerShown: false }}
+                options={{
+                  headerShown: false,
+                  tabBarIcon: ({ focused, size }) => {
+                    return focused ? (
+                      <Image
+                        source={require("./src/images/icons/contacts-book-blue.png")}
+                        style={{ width: size, height: size }}
+                      />
+                    ) : (
+                      <Image
+                        source={require("./src/images/icons/contacts-book.png")}
+                        style={{ width: size, height: size }}
+                      />
+                    );
+                  },
+                }}
               >
-                {(props) => (
-                  <ContactList
-                    {...props}
-                    userID={user.uid}
-                  />
-                )}
+                {(props) => <ContactList {...props} userID={user.uid} />}
               </Tab.Screen>
               <Tab.Screen
-                name="SMS Campaign"
+                name="Campaign"
                 component={Dashboard}
-                options={{ headerShown: false }}
+                options={{
+                  headerShown: false,
+                  tabBarIcon: ({ focused, size }) => {
+                    return focused ? (
+                      <Image
+                        source={require("./src/images/icons/sms-blue.png")}
+                        style={{ width: size, height: size }}
+                      />
+                    ) : (
+                      <Image
+                        source={require("./src/images/icons/sms.png")}
+                        style={{ width: size, height: size }}
+                      />
+                    );
+                  },
+                }}
               />
               <Tab.Screen
                 name="Settings"
-                options={{ headerShown: false }}
+                options={{
+                  headerShown: false,
+                  tabBarIcon: ({ focused, size }) => {
+                    return focused ? (
+                      <Image
+                        source={require("./src/images/icons/settings-blue.png")}
+                        style={{ width: size, height: size }}
+                      />
+                    ) : (
+                      <Image
+                        source={require("./src/images/icons/settings.png")}
+                        style={{ width: size, height: size }}
+                      />
+                    );
+                  },
+                }}
               >
                 {(props) => (
                   <Settings
