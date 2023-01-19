@@ -16,6 +16,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import LogInScreen from "./src/components/LogInScreen";
 import Dashboard from "./src/components/Dashboard";
 import Settings from "./src/components/Settings";
+import ContactList from "./src/components/ContactList";
 
 //Context Import
 import { CurrentListContextProvider } from "./src/utility/Contexts/CurrentListContext";
@@ -66,9 +67,15 @@ function App() {
               </Tab.Screen>
               <Tab.Screen
                 name="Call List"
-                component={Dashboard}
                 options={{ headerShown: false }}
-              />
+              >
+                {(props) => (
+                  <ContactList
+                    {...props}
+                    userID={user.uid}
+                  />
+                )}
+              </Tab.Screen>
               <Tab.Screen
                 name="SMS Campaign"
                 component={Dashboard}
