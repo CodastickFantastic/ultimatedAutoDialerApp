@@ -53,7 +53,9 @@ function ContactList(props) {
           </Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={{padding: 10}}>{dataBase}</ScrollView>
+        <ScrollView contentContainerStyle={{ padding: 10 }}>
+          {dataBase}
+        </ScrollView>
       )}
     </View>
   );
