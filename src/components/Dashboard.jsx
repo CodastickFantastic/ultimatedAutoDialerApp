@@ -246,7 +246,6 @@ function Dashboard(props) {
                 })
               }
             />
-            <Text style={styles.basicFont}>Add note</Text>
             <TextInput
               style={styles.note}
               multiline={true}
@@ -297,10 +296,9 @@ const styles = StyleSheet.create({
     flex: 0.7,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 20,
   },
   callsInfo: {
-    marginTop: 20,
     width: 300,
     flexDirection: "row",
     borderWidth: 1,
@@ -319,6 +317,9 @@ const styles = StyleSheet.create({
     flex: 2,
     justifyContent: "center",
     alignContent: "center",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 15,
   },
   selectDropdown: {
     marginTop: 20,
@@ -328,11 +329,15 @@ const styles = StyleSheet.create({
   note: {
     backgroundColor: "white",
     marginBottom: 20,
-    height: 100,
+    height: 110,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "#24A0ED",
   },
   buttonSection: {
     flexDirection: "row",
     justifyContent: "space-evenly",
+    marginBottom: 10,
   },
   callBtn: {
     backgroundColor: "#32DE84",
@@ -341,12 +346,14 @@ const styles = StyleSheet.create({
     height: 35,
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: 5,
   },
   nextBtn: {
     backgroundColor: "#24A0ED",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: 5,
   },
 });
 
