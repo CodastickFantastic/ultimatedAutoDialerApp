@@ -1,5 +1,5 @@
 // Import React
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import {
   Text,
   View,
@@ -7,8 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  NativeModules,
-  PermissionsAndroid,
+  ToastAndroid,
 } from "react-native";
 
 // Dropdown Selector
@@ -17,6 +16,12 @@ import SelectDropdown from "react-native-select-dropdown";
 // Import Context
 import CurrentListContext from "../utility/Contexts/CurrentListContext";
 
+// Import Firebase
+import { firebase } from "@react-native-firebase/database";
+
+// Import own Native module - dialer
+import dialer from "../utility/dialer";
+
 function Dashboard(props) {
   // Feedback List
   const feedbackOptions = ["Called", "Not answer", "Lead", "Calendar"];
@@ -24,40 +29,142 @@ function Dashboard(props) {
   // Context Variables
   const { currentList, dataBaseObj } = useContext(CurrentListContext);
 
-  // Native Module Initializer - Dialer
-  const { DialerModule } = NativeModules;
+  // Handling of show database records
+  // const [contactDetials, setContactDetials] = useState({name: "Adam Kowalski", number: "501 722 427", mail: "adam.kowalski@gmail.com"})
+  const [contactDetials, setContactDetials] = useState({});
+  const [lastToCall, setLastToCall] = useState({ initial: 0 });
+  const [totalCalled, setTotalCalled] = useState();
+  const [contactNumber, setContactNumber] = useState(0);
+  const feedbackDropdownRef = useRef({});
 
-  function makeCall(number = "") {
-    // Andoid require permision to make calls, here we ask user for that permission if it is not granted.
-    async function requestCallPhonePrrmission() {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CALL_PHONE,
-          {
-            title: "Ultimate Dialer App Permission",
-            message: "Ultimate Dialer need acces to your phone call",
-            buttonNeutral: "Ask me later",
-            buttonNegative: "Denied",
-            buttonPositive: "Grant",
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          await DialerModule.makeCall(number);
-        } else {
-          console.log("Permission denied");
-        }
-      } catch (err) {
-        console.log(err);
+  useEffect(() => {
+    let convertedDataBaseArr;
+    if (
+      currentList != "" &&
+      dataBaseObj.contactLists[currentList].contacts != undefined
+    ) {
+      convertedDataBaseArr = Object.entries(
+        dataBaseObj.contactLists[currentList].contacts
+      ); // Current database object converted to array
+
+      convertedDataBaseArr = convertedDataBaseArr.filter(
+        (record) => record[1].called === "none"
+      ); // Filter out called contacts
+
+      // Start tracking "Done" calls on Live
+      firebase
+        .app()
+        .database(
+          "https://ultimatedialerapp-default-rtdb.europe-west1.firebasedatabase.app/"
+        )
+        .ref(`/users/${props.userID}/contactLists/${currentList}/`)
+        .on("value", (response) => {
+          let data = response.toJSON();
+          setTotalCalled(data.calledCounter);
+        });
+    }
+
+    if (convertedDataBaseArr != undefined) {
+      setContactDetials({
+        name: convertedDataBaseArr[contactNumber][0],
+        number: convertedDataBaseArr[contactNumber][1].number,
+        mail: convertedDataBaseArr[contactNumber][1].mail,
+        note: "",
+      });
+
+      if (lastToCall.initial != convertedDataBaseArr.length) {
+        setLastToCall({
+          initial: convertedDataBaseArr.length,
+          current: convertedDataBaseArr.length,
+        });
+      } else {
+        setLastToCall((prevNumber) => {
+          return {
+            ...prevNumber,
+            current: prevNumber.current - 1,
+          };
+        });
       }
     }
-    requestCallPhonePrrmission();
+  }, [currentList, contactNumber]);
+
+  // Handling Next contact button
+  function nextContact() {
+    if (contactDetials.feedback !== undefined) {
+      if (contactNumber < lastToCall.initial - 1) {
+        setContactNumber((prevNumber) => prevNumber + 1);
+        feedbackDropdownRef.current.reset();
+        saveData();
+        //Update Done calls counter
+        firebase
+          .app()
+          .database(
+            "https://ultimatedialerapp-default-rtdb.europe-west1.firebasedatabase.app/"
+          )
+          .ref(`/users/${props.userID}/contactLists/${currentList}/`)
+          .update({
+            calledCounter: totalCalled + 1,
+          });
+      } else {
+        ToastAndroid.showWithGravity(
+          "All contacts has been called, load another list !!!! REMEBER TO ADD SAVE OPTION HERE !!!!",
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER
+        );
+        saveData();
+      }
+    } else {
+      ToastAndroid.showWithGravity(
+        "You need to select feedback first",
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER
+      );
+    }
   }
 
-  // if (dataBaseObj) {
-  //   for (contact in dataBaseObj.contactLists.Facebook) {
-  //     console.log(contact, dataBaseObj.contactLists.Facebook[contact].number);
-  //   }
-  // }
+  // Handling Save Feedback in database
+  function saveData() {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    let currentDate = new Date();
+    let d = currentDate.getDay();
+    let m = currentDate.getMonth();
+    let y = currentDate.getFullYear();
+    let h = currentDate.getHours();
+    let mi = currentDate.getMinutes();
+    let s = currentDate.getSeconds();
+    d.toString().length == 1 ? (d = "0" + d) : (d = d);
+    h.toString().length == 1 ? (h = "0" + h) : (h = h);
+    mi.toString().length == 1 ? (mi = "0" + mi) : (mi = mi);
+    s.toString().length == 1 ? (s = "0" + s) : (s = s);
+    let date = d + "/" + months[m] + "/" + y + " - " + h + ":" + mi + ":" + s;
+    // Save contact details
+    firebase
+      .app()
+      .database(
+        "https://ultimatedialerapp-default-rtdb.europe-west1.firebasedatabase.app/"
+      )
+      .ref(
+        `/users/${props.userID}/contactLists/${currentList}/contacts/${contactDetials.name}`
+      )
+      .update({
+        note: contactDetials.note,
+        feedback: contactDetials.feedback,
+        called: date,
+      });
+  }
 
   return (
     <View style={styles.componentContainer}>
@@ -83,11 +190,15 @@ function Dashboard(props) {
             </Text>
             <View style={styles.callsInfo}>
               <View style={styles.callsInfoLeft}>
-                <Text style={{ color: "#24A0ED", fontSize: 34 }}>127</Text>
+                <Text style={{ color: "#24A0ED", fontSize: 34 }}>
+                  {totalCalled}
+                </Text>
                 <Text style={styles.basicFont}>Done</Text>
               </View>
               <View style={styles.callsInfoRight}>
-                <Text style={{ color: "#24A0ED", fontSize: 34 }}>231</Text>
+                <Text style={{ color: "#24A0ED", fontSize: 34 }}>
+                  {lastToCall.current}
+                </Text>
                 <Text style={styles.basicFont}>To Call</Text>
               </View>
             </View>
@@ -107,39 +218,57 @@ function Dashboard(props) {
                 textAlign: "center",
               }}
             >
-              Adam Kowalski
+              {contactDetials.name}
             </Text>
-
             <Text style={styles.basicFont}>
               <Image
                 source={require("../images/icons/phone.png")}
                 style={{ width: 20, height: 20 }}
               />{" "}
-              501 721 417
+              {contactDetials.number}
             </Text>
             <Text style={styles.basicFont}>
               <Image
                 source={require("../images/icons/mail.png")}
                 style={{ width: 20, height: 20 }}
               />{" "}
-              adam.kowalskii@gmail.com
+              {contactDetials.mail}
             </Text>
             <SelectDropdown
               data={feedbackOptions}
               buttonStyle={styles.selectDropdown}
               buttonTextStyle={{ fontSize: 26 }}
               defaultButtonText="Select feedback..."
+              ref={feedbackDropdownRef}
+              onSelect={(selectedItem, index) =>
+                setContactDetials((prevState) => {
+                  return { ...prevState, feedback: selectedItem };
+                })
+              }
             />
             <Text style={styles.basicFont}>Add note</Text>
-            <TextInput style={styles.note} multiline={true} />
+            <TextInput
+              style={styles.note}
+              multiline={true}
+              placeholder="Add here note if you need to precise some infomration..."
+              value={contactDetials.note}
+              onChangeText={(text) =>
+                setContactDetials((prevState) => {
+                  return { ...prevState, note: text };
+                })
+              }
+            />
             <View style={styles.buttonSection}>
               <TouchableOpacity
                 style={styles.callBtn}
-                onPress={() => makeCall("+48 501 721 417")}
+                onPress={() => dialer(contactDetials.number)}
               >
                 <Text style={styles.basicFont}>Call</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.nextBtn}>
+              <TouchableOpacity
+                style={styles.nextBtn}
+                onPress={() => nextContact()}
+              >
                 <Text style={styles.basicFont}>Next</Text>
               </TouchableOpacity>
             </View>
@@ -165,9 +294,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#d9d9d9",
   },
   statsContainer: {
-    flex: 1,
+    flex: 0.7,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 15,
   },
   callsInfo: {
     marginTop: 20,

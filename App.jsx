@@ -59,6 +59,7 @@ function App() {
                   <Dashboard
                     {...props}
                     userName={user.displayName.split(" ")[0]}
+                    userID={user.uid}
                     
                   />
                 )}

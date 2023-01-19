@@ -9,7 +9,7 @@ const CurrentListContext = createContext();
 export function CurrentListContextProvider(props) {
   const [callList, setCallList] = useState(); // Holding all contact lists
   const [currentList, setCurrentList] = useState(""); // Holding current list
-  const [dataBaseObj, setDataBaseObj] = useState(); // Holding whole Data Base Object
+  const [dataBaseObj, setDataBaseObj] = useState(); // Holding whole STATIC Data Base Object
 
   //Download User Database Object
   useEffect(() => {
@@ -30,6 +30,26 @@ export function CurrentListContextProvider(props) {
         setDataBaseObj(data);
       });
   }, []);
+
+  //Download Database Called
+  // useEffect(() => {
+  //   firebase
+  //     .app()
+  //     .database(
+  //       "https://ultimatedialerapp-default-rtdb.europe-west1.firebasedatabase.app/"
+  //     )
+  //     .ref(`/users/${props.userID}`)
+  //     .once("value")
+  //     .then((response) => response.toJSON())
+  //     .then((data) => {
+  //       setCallList(
+  //         Object.keys(data.contactLists).map((key) => {
+  //           return key;
+  //         })
+  //       );
+  //       setDataBaseObj(data);
+  //     });
+  // }, []);
 
   return (
     <CurrentListContext.Provider
