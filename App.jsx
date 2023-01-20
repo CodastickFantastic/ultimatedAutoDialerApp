@@ -14,6 +14,7 @@ import LogInScreen from "./src/components/LogInScreen";
 import Dashboard from "./src/components/Dashboard";
 import Settings from "./src/components/Settings";
 import ContactList from "./src/components/ContactList";
+import SmsCampaign from "./src/components/SmsCampaign";
 
 //Context Import
 import { CurrentListContextProvider } from "./src/utility/Contexts/CurrentListContext";
@@ -51,7 +52,7 @@ function App() {
       <View style={styles.componentContainer}>
         <CurrentListContextProvider userID={user.uid}>
           <NavigationContainer>
-            <Tab.Navigator>
+            <Tab.Navigator screenOptions={{ tabBarInactiveTintColor: "black" }}>
               <Tab.Screen
                 name="Dashboard"
                 options={{
@@ -102,7 +103,7 @@ function App() {
               </Tab.Screen>
               <Tab.Screen
                 name="Campaign"
-                component={Dashboard}
+                component={SmsCampaign}
                 options={{
                   headerShown: false,
                   tabBarIcon: ({ focused, size }) => {
@@ -124,6 +125,7 @@ function App() {
                 name="Settings"
                 options={{
                   headerShown: false,
+                  tabBarBadgeStyle: "green",
                   tabBarIcon: ({ focused, size }) => {
                     return focused ? (
                       <Image

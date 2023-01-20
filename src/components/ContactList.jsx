@@ -37,7 +37,7 @@ function ContactList(props) {
           setDataBase(componentsDataArray);
         });
     }
-  }, []);
+  }, [currentList]);
 
   return (
     <View style={styles.componentContainer}>
