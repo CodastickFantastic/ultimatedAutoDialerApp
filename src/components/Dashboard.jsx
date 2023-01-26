@@ -60,7 +60,7 @@ function Dashboard(props) {
         .ref(`/users/${props.userID}/contactLists/${currentList}/`)
         .on("value", (response) => {
           let data = response.toJSON();
-          setTotalCalled(data.calledCounter);
+          setTotalCalled(data.callCounter);
         });
     }
 
@@ -103,7 +103,7 @@ function Dashboard(props) {
           )
           .ref(`/users/${props.userID}/contactLists/${currentList}/`)
           .update({
-            calledCounter: totalCalled + 1,
+            callCounter: totalCalled + 1,
           });
       } else {
         ToastAndroid.showWithGravity(
