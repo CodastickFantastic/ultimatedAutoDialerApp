@@ -43,11 +43,13 @@ function ContactList(props) {
     <View style={styles.componentContainer}>
       {currentList == "" ? (
         <View style={styles.userGreeting}>
-          <Text style={{ marginBottom: 10, textAlign: "center" }}>
+          <Text
+            style={{ marginBottom: 10, textAlign: "center", color: "white" }}
+          >
             Go to settings, pick "list to call" and come here back to see all
             contacts in choosen list.
           </Text>
-          <Text style={{ textAlign: "center" }}>
+          <Text style={{ textAlign: "center", color: "white" }}>
             If you dont have any lists you have to add it via Web Browser under
             https://www.ultiamteautodialer.com/
           </Text>
