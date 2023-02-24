@@ -12,7 +12,7 @@ function ContactListItem(props) {
           <Text style={styles.basicFont}>{props.number}</Text>
         </View>
         <Text style={styles.basicFont}>Last call: {props.lastCall}</Text>
-        <Text style={styles.basicFont}>Feedback: {props.feedback} </Text>
+        <Text style={styles.basicFont}>Feedback: {props.feedback[0]} </Text>
       </View>
       <View style={styles.right}>
         <TouchableOpacity
@@ -31,7 +31,7 @@ function ContactListItem(props) {
 
 const styles = StyleSheet.create({
   basicFont: {
-    color: "black",
+    color: "white",
     fontSize: 16,
   },
   contact: {
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingTop: 10,
     flexDirection: "row",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#111111",
     marginBottom: 15,
   },
   left: {

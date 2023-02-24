@@ -1,23 +1,25 @@
 import React from "react";
-import { View, Text, StyleSheet} from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
-function SmsCampaign(){
-    return(
-        <View style={styles.componentContainer}>
-            <Text>Section Under Development</Text>
-            <Text>To Do:</Text>
-            <Text>Native Module For Autoamted SMS Campaigns</Text>
-        </View>
-    )
+function SmsCampaign() {
+  return (
+    <View style={styles.componentContainer}>
+      <Text style={{ color: "white" }}>Section Under Development</Text>
+      <Text style={{ color: "white" }}>To Do:</Text>
+      <Text style={{ color: "white" }}>
+        Native Module For Autoamted SMS Campaigns
+      </Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    componentContainer:{
-        height: "100%",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#d9d9d9"
-    }
-})
+  componentContainer: {
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#181818",
+  },
+});
 
-export default SmsCampaign
+export default SmsCampaign;

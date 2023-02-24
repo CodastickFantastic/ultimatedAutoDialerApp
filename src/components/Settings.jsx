@@ -17,7 +17,7 @@ function Settings(props) {
     <View style={styles.componentContainer}>
       <View style={styles.loggedUser}>
         <Image style={styles.userAvatar} source={{ uri: props.avatar }} />
-        <Text style={{ fontSize: 22, marginBottom: 10 }}>{props.userName}</Text>
+        <Text style={{ fontSize: 22, marginBottom: 10, color: "white" }}>{props.userName}</Text>
         <Button
           title="Sing-Out"
           onPress={() =>
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    backgroundColor: "#d9d9d9",
+    backgroundColor: "#181818",
   },
   loggedUser: {
     flex: 1,

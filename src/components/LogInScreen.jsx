@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, View, Text, StyleSheet } from "react-native";
+import { Button, View, Text, StyleSheet, Image } from "react-native";
 
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
@@ -26,8 +26,7 @@ function LogInScreen() {
 
   return (
     <View style={styles.sectionContainer}>
-      <Text style={styles.loginTitle}>Ultimate Dialer App</Text>
-      <Text style={styles.loginDescription}>Telemarketer Center</Text>
+      <Image source={require("../images/logo.png")} style={styles.logo} />
       <Button
         title="Google Sign-In"
         onPress={() =>
@@ -45,10 +44,12 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#d9d9d9",
+    backgroundColor: "#181818",
   },
-  loginTitle: {
-    fontSize: 28,
+  logo: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain"
   },
   loginDescription: {
     fontSize: 20,

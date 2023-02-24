@@ -23,11 +23,9 @@ import { firebase } from "@react-native-firebase/database";
 import dialer from "../utility/dialer";
 
 function Dashboard(props) {
-  // Feedback List
-  const feedbackOptions = ["Called", "Not answer", "Lead", "Calendar"];
-
   // Context Variables
-  const { currentList, dataBaseObj } = useContext(CurrentListContext);
+  const { currentList, dataBaseObj, userStats, setCurrentList } =
+    useContext(CurrentListContext);
 
   // Handling of show database records
   // const [contactDetials, setContactDetials] = useState({name: "Adam Kowalski", number: "501 722 427", mail: "adam.kowalski@gmail.com"})
@@ -35,56 +33,65 @@ function Dashboard(props) {
   const [lastToCall, setLastToCall] = useState({ initial: 0 });
   const [totalCalled, setTotalCalled] = useState();
   const [contactNumber, setContactNumber] = useState(0);
+  const [feedbackOptions, setFeedbackOptions] = useState([
+    ["Called", "called"],
+    ["No answer", "no answer"],
+    ["Calendar", "lead"],
+  ]);
   const feedbackDropdownRef = useRef({});
 
   useEffect(() => {
-    let convertedDataBaseArr;
-    if (
-      currentList != "" &&
-      dataBaseObj.contactLists[currentList].contacts != undefined
-    ) {
-      convertedDataBaseArr = Object.entries(
-        dataBaseObj.contactLists[currentList].contacts
-      ); // Current database object converted to array
+    try {
+      if (
+        currentList != "" &&
+        dataBaseObj.contactLists[currentList].contacts != undefined
+      ) {
+        let convertedDataBaseArr;
+        convertedDataBaseArr = Object.entries(
+          dataBaseObj.contactLists[currentList].contacts
+        ); // Current database object converted to array
 
-      convertedDataBaseArr = convertedDataBaseArr.filter(
-        (record) => record[1].called === "none"
-      ); // Filter out called contacts
+        convertedDataBaseArr = convertedDataBaseArr.filter(
+          (record) => record[1].called === "none"
+        ); // Filter out called contacts
 
-      // Start tracking "Done" calls on Live
-      firebase
-        .app()
-        .database(
-          "https://ultimatedialerapp-default-rtdb.europe-west1.firebasedatabase.app/"
-        )
-        .ref(`/users/${props.userID}/contactLists/${currentList}/`)
-        .on("value", (response) => {
-          let data = response.toJSON();
-          setTotalCalled(data.callCounter);
-        });
-    }
+        // Start tracking "Done" calls on Live
+        firebase
+          .app()
+          .database(
+            "https://ultimatedialerapp-default-rtdb.europe-west1.firebasedatabase.app/"
+          )
+          .ref(`/users/${props.userID}/contactLists/${currentList}/`)
+          .on("value", (response) => {
+            let data = response.toJSON();
+            setTotalCalled(data.callCounter);
+          });
 
-    if (convertedDataBaseArr != undefined) {
-      setContactDetials({
-        name: convertedDataBaseArr[contactNumber][0],
-        number: convertedDataBaseArr[contactNumber][1].number,
-        mail: convertedDataBaseArr[contactNumber][1].mail,
-        note: "",
-      });
+        if (convertedDataBaseArr != undefined) {
+          setContactDetials({
+            name: convertedDataBaseArr[contactNumber][0],
+            number: convertedDataBaseArr[contactNumber][1].number,
+            mail: convertedDataBaseArr[contactNumber][1].mail,
+            note: "",
+          });
 
-      if (lastToCall.initial != convertedDataBaseArr.length) {
-        setLastToCall({
-          initial: convertedDataBaseArr.length,
-          current: convertedDataBaseArr.length,
-        });
-      } else {
-        setLastToCall((prevNumber) => {
-          return {
-            ...prevNumber,
-            current: prevNumber.current - 1,
-          };
-        });
+          if (lastToCall.initial != convertedDataBaseArr.length) {
+            setLastToCall({
+              initial: convertedDataBaseArr.length,
+              current: convertedDataBaseArr.length,
+            });
+          } else {
+            setLastToCall((prevNumber) => {
+              return {
+                ...prevNumber,
+                current: prevNumber.current - 1,
+              };
+            });
+          }
+        }
       }
+    } catch (error) {
+      setCurrentList("completed");
     }
   }, [currentList, contactNumber]);
 
@@ -107,7 +114,7 @@ function Dashboard(props) {
           });
       } else {
         ToastAndroid.showWithGravity(
-          "All contacts has been called, load another list !!!! REMEBER TO ADD SAVE OPTION HERE !!!!",
+          "All contacts has been called, load another list",
           ToastAndroid.LONG,
           ToastAndroid.CENTER
         );
@@ -139,7 +146,7 @@ function Dashboard(props) {
       "December",
     ];
     let currentDate = new Date();
-    let d = currentDate.getDay();
+    let d = currentDate.getDate();
     let m = currentDate.getMonth();
     let y = currentDate.getFullYear();
     let h = currentDate.getHours();
@@ -164,6 +171,26 @@ function Dashboard(props) {
         feedback: contactDetials.feedback,
         called: date,
       });
+    console.log(contactDetials.feedback[1]);
+
+    // Update Stats
+    firebase
+      .app()
+      .database(
+        "https://ultimatedialerapp-default-rtdb.europe-west1.firebasedatabase.app/"
+      )
+      .ref(`/users/${props.userID}/stats/`)
+      .update({
+        totalAnsweredCalls:
+          contactDetials.feedback[1] === "called"
+            ? userStats.totalAnsweredCalls + 1
+            : userStats.totalAnsweredCalls,
+        totalDoneCalls: userStats.totalDoneCalls + 1,
+        totalLeads:
+          contactDetials.feedback[1] === "lead"
+            ? userStats.totalLeads + 1
+            : userStats.totalLeads,
+      });
   }
 
   return (
@@ -173,10 +200,24 @@ function Dashboard(props) {
           <Text style={{ color: "#24A0ED", fontSize: 24, textAlign: "center" }}>
             Hi {props.userName}
           </Text>
-          <Text style={{ marginBottom: 10, textAlign: "center" }}>
+          <Text
+            style={{ marginBottom: 10, textAlign: "center", color: "white" }}
+          >
             Go to settings, pick "list to call" and come here back.
           </Text>
-          <Text style={{ textAlign: "center" }}>
+          <Text style={{ textAlign: "center", color: "white" }}>
+            If you dont have any lists you have to add it via Web Browser under
+            https://www.ultiamteautodialer.com/
+          </Text>
+        </View>
+      ) : currentList == "completed" ? (
+        <View style={styles.userGreeting}>
+          <Text
+            style={{ marginBottom: 10, textAlign: "center", color: "white", fontSize: 18 }}
+          >
+            Error: Following list is completely called.
+          </Text>
+          <Text style={{ textAlign: "center", color: "white" }}>
             If you dont have any lists you have to add it via Web Browser under
             https://www.ultiamteautodialer.com/
           </Text>
@@ -211,7 +252,7 @@ function Dashboard(props) {
             </Text>
             <Text
               style={{
-                color: "black",
+                color: "white",
                 fontSize: 28,
                 marginBottom: 10,
                 fontWeight: "700",
@@ -280,7 +321,7 @@ function Dashboard(props) {
 
 const styles = StyleSheet.create({
   basicFont: {
-    color: "black",
+    color: "white",
     fontSize: 22,
     textAlign: "center",
   },
@@ -290,7 +331,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
-    backgroundColor: "#d9d9d9",
+    backgroundColor: "#181818",
   },
   statsContainer: {
     flex: 0.7,
@@ -317,7 +358,7 @@ const styles = StyleSheet.create({
     flex: 2,
     justifyContent: "center",
     alignContent: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#181818",
     borderRadius: 20,
     padding: 15,
   },
